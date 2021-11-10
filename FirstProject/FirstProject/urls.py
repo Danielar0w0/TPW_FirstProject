@@ -21,5 +21,6 @@ urlpatterns = [
     path('', views.start_screen),
     path('/', views.start_screen),
     path('admin/', admin.site.urls),
-    path('feed/', views.feed)
+    path('feed/', views.feed),
+    path('friends/', views.friends)
 ]
