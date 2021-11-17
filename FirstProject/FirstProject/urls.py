@@ -17,10 +17,16 @@ from django.contrib import admin
 from django.urls import path
 from app import views
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('', views.start_screen),
     path('/', views.start_screen),
     path('admin/', admin.site.urls),
     path('feed/', views.feed),
-    path('friends/', views.friends)
-]
+    path('friends/', views.friends),
+    path('profile/', views.profile),
+    path('create/', views.create)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
