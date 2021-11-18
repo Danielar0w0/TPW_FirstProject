@@ -1,16 +1,10 @@
-<<<<<<< HEAD
 from datetime import timezone
 
 from django.db.models import Q
 
-from app.models import Post, User, Friendship
+from app.models import Post, User,Comment, Friendship
 from django.shortcuts import render, redirect
-from app.forms import PostForm, RegisterForm
-=======
-from django.shortcuts import render, redirect
-from app.models import Post, Comment, User
 from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm
->>>>>>> ee24de47b45a45b41aefa558521ae0529b862bdb
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 
@@ -119,10 +113,6 @@ def register(request):
             request.session["user"] = user_email
 
             return render(request, 'startScreen.html')
-<<<<<<< HEAD
-=======
-
->>>>>>> ee24de47b45a45b41aefa558521ae0529b862bdb
     else:
         form = RegisterForm()
 
