@@ -1,7 +1,7 @@
 from datetime import timezone
 
 from django.shortcuts import render
-from app.models import Post
+from app.models import Post, User, Friendship
 from app.forms import PostForm, RegisterForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
@@ -71,7 +71,12 @@ def register(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
+            user = User(user_email=form.cleaned_data.get('email'), username=username, password=raw_password)
+            user.save()
             return render(request,'startScreen.html')
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form': form})
+
+
+

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block content %}
+
+   <div class="py-5">
+       <div class="container">
+           <h1>Search results</h1>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
+                {% for user in users %}
+                    <div class="col">
+                        <form action="." method="post" >
+                            <a href="/profile/{{ user.username }}" style="text-decoration: none;">
+                                <img src="{{ user.image }}">
+                                <p>{{ user.username }}</p>
+                            </a>
+                            <input type="submit" name="friend" value="{{ user.user_email }}" class="btn btn-primary">Add friend</input>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+       </div>
+   </div>
+
+{% endblock %}
