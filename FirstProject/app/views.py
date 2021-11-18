@@ -1,8 +1,6 @@
-from datetime import timezone
-
 from django.shortcuts import render, redirect
-from app.models import Post, User
-from app.forms import PostForm, RegisterForm, DeletePostForm
+from app.models import Post, Comment, User
+from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 
@@ -39,14 +37,14 @@ def profile2(request, user_email):
 
 @login_required(login_url='/login/')
 def profile(request):
-    user_email = request.session["user"]
 
     # try:
     #    user = User.objects.get(user_email=user_email)
     # except ObjectDoesNotExist:
     #    return redirect('/login')
 
-    user = User.objects.get(user_email=user_email)
+    user = User.objects.get(user_email=request.user.email)
+    comment_form = CommentForm()
 
     try:
         posts = Post.objects.filter(user=user)
@@ -54,7 +52,8 @@ def profile(request):
         posts = []
 
     params = {
-        'posts': posts
+        'posts': posts,
+        'form': comment_form
     }
 
     return render(request, 'profile.html', params)
@@ -83,9 +82,13 @@ def create(request):
 
 
 def register(request):
+
     if request.method == 'POST':
+
         form = RegisterForm(request.POST)
+
         if form.is_valid():
+
             form.save()
 
             user_email = form.cleaned_data.get('email')
@@ -104,6 +107,7 @@ def register(request):
             request.session["user"] = user_email
 
             return render(request, 'startScreen.html')
+
     else:
         form = RegisterForm()
 
@@ -128,3 +132,33 @@ def delete(request):
 def logout(request):
     request.session["user"] = ""
     return redirect('/login')
+
+
+def comment(request):
+
+    if request.method == 'POST':
+
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+
+            post_id = request.POST['post_id']
+            user_email = request.POST['user_email']
+            comment_content = form.cleaned_data.get('comment_content')
+
+            user = User.objects.get(user_email=user_email)
+
+            new_comment = Comment(post_id=post_id, content=comment_content, user=user)
+            new_comment.save()
+
+        return redirect('/profile')
+
+
+def post_details(request, post_id):
+
+    post = Post.objects.filter(post_id=post_id)[0]
+    comments = Comment.objects.filter(post__post_id=post_id)
+
+    params = {'post': post, 'comments': comments}
+
+    return render(request, 'post_details.html', params)
