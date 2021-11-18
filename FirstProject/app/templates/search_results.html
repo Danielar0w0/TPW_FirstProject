@@ -2,22 +2,32 @@
 {% load static %}
 
 {% block content %}
-
    <div class="py-5">
        <div class="container">
            <h1>Search results</h1>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
-                {% for user in users %}
-                    <div class="col">
-                        <form action="." method="post" >
-                            <a href="/profile/{{ user.username }}" style="text-decoration: none;">
-                                <img src="{{ user.image }}">
-                                <p>{{ user.username }}</p>
-                            </a>
-                            <input type="submit" name="friend" value="{{ user.user_email }}" class="btn btn-primary">Add friend</input>
-                        </form>
-                    </div>
-                {% endfor %}
+                {% if users|length > 0 %}
+                    {% for user in users %}
+                        <div class="col">
+                            <form action="." method="post" >
+                                {% csrf_token %}
+                                <a href="/profile/{{ user.username }}" style="text-decoration: none;">
+                                    <img src="{{ user.image }}">
+                                    <p>{{ user.username }}</p>
+                                </a>
+                                {% if user.user_email in friends %}
+                                    <input type="hidden" name="remove_friend" value="{{ user.user_email }}">
+                                    <input type="submit" value="Unfollow" class="btn btn-primary")>
+                                {% else %}
+                                    <input type="hidden" name="add_friend" value="{{ user.user_email }}">
+                                    <input type="submit" value="Follow" class="btn btn-primary">
+                                {% endif %}
+                            </form>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No results</p>
+                {% endif %}
             </div>
        </div>
    </div>
