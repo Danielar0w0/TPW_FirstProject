@@ -1,10 +1,12 @@
 from datetime import timezone
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from app.models import Post
 from app.forms import PostForm, RegisterForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
+
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def layout(request):
@@ -35,8 +37,15 @@ def profile2(request, user_email):
 
 @login_required(login_url='/login/')
 def profile(request):
+    user_email = request.session["user"]
+
+    try:
+        posts = Post.objects.filter(user_email=user_email)
+    except ObjectDoesNotExist:
+        posts = []
+
     params = {
-        'posts': Post.objects.all().order_by('-post_id')
+        'posts': posts
     }
 
     return render(request, 'profile.html', params)
@@ -47,7 +56,7 @@ def create(request):
         form = PostForm(request.POST, request.FILES)
 
         if form.is_valid():
-            user_email = "t@ua.pt"  # Hardcoded [TO CHANGE]
+            user_email = request.session["user"]
             description = request.POST["description"]
             file = request.FILES['file']
 
@@ -67,11 +76,29 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
+
+            user_email = form.cleaned_data.get('email')
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
+
+            # Authenticate user
             user = authenticate(username=username, password=raw_password)
             login(request, user)
+
+            # Save user if user is authenticated
+            user = User(user_email=user_email, username=username, password=raw_password)
+            user.save()
+
+            # Save session
+            request.session["user"] = user_email
+
             return render(request,'startScreen.html')
     else:
         form = RegisterForm()
+
     return render(request, 'register.html', {'form': form})
+
+def logout(request):
+    request.session["user"] = ""
+    return redirect('/login')
+
