@@ -1,8 +1,8 @@
 from datetime import timezone
 
 from django.shortcuts import render, redirect
-from app.models import Post
-from app.forms import PostForm, RegisterForm
+from app.models import Post, User
+from app.forms import PostForm, RegisterForm, DeletePostForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 
@@ -27,6 +27,7 @@ def feed(request):
 def friends(request):
     return render(request, 'friends.html')
 
+
 @login_required(login_url='/login/')
 def profile2(request, user_email):
     params = {
@@ -35,12 +36,20 @@ def profile2(request, user_email):
 
     return render(request, 'profile.html', params)
 
+
 @login_required(login_url='/login/')
 def profile(request):
     user_email = request.session["user"]
 
+    # try:
+    #    user = User.objects.get(user_email=user_email)
+    # except ObjectDoesNotExist:
+    #    return redirect('/login')
+
+    user = User.objects.get(user_email=user_email)
+
     try:
-        posts = Post.objects.filter(user_email=user_email)
+        posts = Post.objects.filter(user=user)
     except ObjectDoesNotExist:
         posts = []
 
@@ -49,6 +58,7 @@ def profile(request):
     }
 
     return render(request, 'profile.html', params)
+
 
 @login_required(login_url='/login/')
 def create(request):
@@ -61,7 +71,8 @@ def create(request):
             file = request.FILES['file']
 
             if description and file:
-                post = Post(user_email=user_email, description=description, file=file)
+                user = User.objects.get(user_email=user_email)
+                post = Post(user=user, description=description, file=file)
                 post.save()
 
                 return render(request, 'success.html')
@@ -82,7 +93,7 @@ def register(request):
             raw_password = form.cleaned_data.get('password1')
 
             # Authenticate user
-            user = authenticate(username=username, password=raw_password)
+            user = authenticate(username=username, password=raw_password, )
             login(request, user)
 
             # Save user if user is authenticated
@@ -92,13 +103,28 @@ def register(request):
             # Save session
             request.session["user"] = user_email
 
-            return render(request,'startScreen.html')
+            return render(request, 'startScreen.html')
     else:
         form = RegisterForm()
 
     return render(request, 'register.html', {'form': form})
 
+
+def delete(request):
+    if request.method == 'POST':
+        form = DeletePostForm(request.POST)
+
+        if form.is_valid():
+
+            post_id = form.cleaned_data.get('post_id')
+            post = Post.objects.get(post_id=post_id)
+
+            # Delete post
+            post.delete()
+
+    return redirect('/profile')
+
+
 def logout(request):
     request.session["user"] = ""
     return redirect('/login')
-
