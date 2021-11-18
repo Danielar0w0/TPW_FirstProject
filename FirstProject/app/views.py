@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from datetime import timezone
 
 from django.db.models import Q
@@ -5,6 +6,11 @@ from django.db.models import Q
 from app.models import Post, User, Friendship
 from django.shortcuts import render, redirect
 from app.forms import PostForm, RegisterForm
+=======
+from django.shortcuts import render, redirect
+from app.models import Post, Comment, User
+from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm
+>>>>>>> ee24de47b45a45b41aefa558521ae0529b862bdb
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 
@@ -31,6 +37,7 @@ def friends(request):
     return render(request, 'friends.html', {'users': friends})
 
 
+
 @login_required(login_url='/login/')
 def profile2(request, user_email):
     params = {
@@ -42,15 +49,23 @@ def profile2(request, user_email):
 
 @login_required(login_url='/login/')
 def profile(request):
-    user_email = request.session["user"]
+
+    # try:
+    #    user = User.objects.get(user_email=user_email)
+    # except ObjectDoesNotExist:
+    #    return redirect('/login')
+
+    user = User.objects.get(user_email=request.user.email)
+    comment_form = CommentForm()
 
     try:
-        posts = Post.objects.filter(user_email=user_email)
+        posts = Post.objects.filter(user=user)
     except ObjectDoesNotExist:
         posts = []
 
     params = {
-        'posts': posts
+        'posts': posts,
+        'form': comment_form
     }
 
     return render(request, 'profile.html', params)
@@ -67,7 +82,8 @@ def create(request):
             file = request.FILES['file']
 
             if description and file:
-                post = Post(user_email=user_email, description=description, file=file)
+                user = User.objects.get(user_email=user_email)
+                post = Post(user=user, description=description, file=file)
                 post.save()
 
                 return render(request, 'success.html')
@@ -78,9 +94,13 @@ def create(request):
 
 
 def register(request):
+
     if request.method == 'POST':
+
         form = RegisterForm(request.POST)
+
         if form.is_valid():
+
             form.save()
 
             user_email = form.cleaned_data.get('email')
@@ -88,7 +108,7 @@ def register(request):
             raw_password = form.cleaned_data.get('password1')
 
             # Authenticate user
-            user = authenticate(username=username, password=raw_password)
+            user = authenticate(username=username, password=raw_password, )
             login(request, user)
 
             # Save user if user is authenticated
@@ -99,15 +119,34 @@ def register(request):
             request.session["user"] = user_email
 
             return render(request, 'startScreen.html')
+<<<<<<< HEAD
+=======
+
+>>>>>>> ee24de47b45a45b41aefa558521ae0529b862bdb
     else:
         form = RegisterForm()
 
     return render(request, 'register.html', {'form': form})
 
 
+def delete(request):
+    if request.method == 'POST':
+        form = DeletePostForm(request.POST)
+
+        if form.is_valid():
+
+            post_id = form.cleaned_data.get('post_id')
+            post = Post.objects.get(post_id=post_id)
+
+            # Delete post
+            post.delete()
+
+    return redirect('/profile')
+
 def logout(request):
     request.session["user"] = ""
     return redirect('/login')
+
 
 
 def search(request):
@@ -136,3 +175,32 @@ def search(request):
             return redirect('/friends/')
 
     return render(request, 'search_results.html', {'users': []})
+
+def comment(request):
+
+    if request.method == 'POST':
+
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+
+            post_id = request.POST['post_id']
+            user_email = request.POST['user_email']
+            comment_content = form.cleaned_data.get('comment_content')
+
+            user = User.objects.get(user_email=user_email)
+
+            new_comment = Comment(post_id=post_id, content=comment_content, user=user)
+            new_comment.save()
+
+        return redirect('/profile')
+
+
+def post_details(request, post_id):
+
+    post = Post.objects.filter(post_id=post_id)[0]
+    comments = Comment.objects.filter(post__post_id=post_id)
+
+    params = {'post': post, 'comments': comments}
+
+    return render(request, 'post_details.html', params)

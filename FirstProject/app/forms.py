@@ -20,9 +20,18 @@ class PostForm(forms.Form):
         }
     ))
 
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(max_length=254, required=True, help_text='Email is required. Please insert a valid email.')
 
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
+
+
+class CommentForm(forms.Form):
+    comment_content = forms.CharField(max_length=256, required=True, help_text='Please add a comment')
+
+
+class DeletePostForm(forms.Form):
+    post_id = forms.IntegerField()

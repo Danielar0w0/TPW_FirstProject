@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="bg-dark rounded-3">
+
+        <div class="row">
+
+            <div class="col-9 mt-5 mb-5">
+                <img src="/media/{{ post.file.name }}" class="card-img-top" height="225" style="object-fit: contain">
+            </div>
+            <div class="col-2">
+
+                <div class="row mt-5 text-light">
+                    <div class="col-4">
+                        {% if post.user.image %}
+                            <img src="/media/{{ post.user.image }}" class="rounded" height="50" style="object-fit: contain">
+                        {% else %}
+                            <img src="{% static "imgs/user.png" %}" class="rounded" height="50" style="object-fit: contain">
+                        {% endif %}
+                    </div>
+                    <div class="col-7">
+                        <p class="fw-bold" style="font-size: 1.2rem">{{ post.user.username }}</p>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <p style="color: white; font-size: 0.9rem"> {{ post.description }}</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <h5 class="mt-5 mb-4" style="color: black"> {{ comments.count }} comments:</h5>
+
+    <div class="container">
+
+        {% for comment in comments %}
+            <div class="h-100 p-4 text-dark bg-light rounded-3 mb-4">
+              <h4>{{ comment.user.username }}</h4>
+              <p class="mt-3 mb-0">{{ comment.content }}</p>
+            </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
