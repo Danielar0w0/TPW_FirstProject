@@ -60,6 +60,8 @@ def profile2(request, user_email):
 def profile(request):
 
     user = User.objects.get(user_email=request.user.email)
+    following = len(Friendship.objects.filter(first_user=user))
+    followers = len(Friendship.objects.filter(second_user=user))
     comment_form = CommentForm()
 
     try:
@@ -70,7 +72,9 @@ def profile(request):
     params = {
         'user': user,
         'posts': posts,
-        'form': comment_form
+        'form': comment_form,
+        'following': following,
+        'followers': followers
     }
 
     return render(request, 'profile.html', params)
@@ -309,8 +313,11 @@ def messages_with(request, username):
     return render(request, 'messages_with.html', {'messages': messages_with_user})
 
 def user_profile(request, email):
+
     user = User.objects.get(user_email=email)
     comment_form = CommentForm()
+    following = len(Friendship.objects.filter(first_user=user))
+    followers = len(Friendship.objects.filter(second_user=user))
 
     try:
         posts = Post.objects.filter(user=user)
@@ -320,6 +327,8 @@ def user_profile(request, email):
     params = {
         'user': user,
         'posts': posts,
-        'form': comment_form
+        'form': comment_form,
+        'following': following,
+        'followers': followers
     }
     return render(request, 'profile.html', params)
