@@ -1,4 +1,4 @@
-from app.models import Post, User, Comment, Friendship, Message
+from app.models import Post, User, Comment, Friendship
 from django.shortcuts import render, redirect
 from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm, ProfileImageForm, ProfilePasswordForm
 from django.contrib.auth.decorators import login_required
@@ -20,6 +20,7 @@ def start_screen(request):
 def feed(request):
 
     all_posts = []
+    comments_form = CommentForm()
     all_messages = []
 
     current_user = User.objects.get(user_email=request.user.email)
@@ -32,7 +33,7 @@ def feed(request):
         friend_messages = Message.objects.filter(sender=current_user, receiver=friend_row.second_user)
         all_messages.extend(friend_messages)
 
-    return render(request, 'feed.html', {'posts': all_posts, 'messages': all_messages})
+    return render(request, 'feed.html', {'posts': all_posts, 'messages': all_messages, 'comment_form': comments_form})
 
 
 @login_required(login_url='/login/')

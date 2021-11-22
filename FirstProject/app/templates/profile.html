@@ -81,9 +81,7 @@
                         <div class="modal-content">
                           <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLongTitle">Comment</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                           </div>
 
                           <div class="modal-body">
@@ -91,10 +89,16 @@
                             <form action="/comment/" method="post" class="form-horizontal justify-content-center">
 
                                 {% csrf_token %}
-                                {{ form }}
+
+                                <div class="row m-3">
+                                    <p class="fw-bolder p-0 mb-2">Add your comment</p>
+                                   {{ form.comment_content }}
+                                </div>
 
                                 <input type="hidden" name="post_id" value="{{ post.post_id }}">
-                                <input type="hidden" name="user_email" value="{{ user.email }}">
+                                <input type="hidden" name="user_email" value="{{ user.user_email }}">
+
+                                <p>Email: {{ user.email }}</p>
 
                                 <div class="modal-footer">
                                     <input type="submit" value="Save" class="btn btn-primary" />
