@@ -25,7 +25,7 @@
                                     <div>
                                         <form action="." method="post" >
                                             {% csrf_token %}
-                                            {% if user.user_email in friends %}
+                                            {% if user in friends %}
                                                 <input type="hidden" name="remove_friend" value="{{ user.user_email }}">
                                                 <input type="submit" value="Unfollow" class="btn btn-primary")>
                                             {% else %}

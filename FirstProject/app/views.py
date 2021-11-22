@@ -1,4 +1,4 @@
-from app.models import Post, User, Comment, Friendship
+from app.models import Post, User, Comment, Friendship, Message
 from django.shortcuts import render, redirect
 from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm, ProfileImageForm, ProfilePasswordForm
 from django.contrib.auth.decorators import login_required
