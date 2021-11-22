@@ -11,6 +11,9 @@ class User(models.Model):
         self.image.storage.delete(self.image.name)
         self.image = file
 
+    def update_password(self, password):
+        self.password = password
+
 
 class Friendship(models.Model):
     id = models.AutoField(primary_key=True)
@@ -41,3 +44,10 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment_id
+
+
+class Message(models.Model):
+    id = models.AutoField(primary_key=True)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
+    content = models.CharField(max_length=256)

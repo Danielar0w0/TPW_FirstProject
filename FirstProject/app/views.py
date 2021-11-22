@@ -21,6 +21,7 @@ def feed(request):
 
     all_posts = []
     comments_form = CommentForm()
+    all_messages = []
 
     current_user = User.objects.get(user_email=request.user.email)
     friends_join = Friendship.objects.select_related('first_user', 'second_user').filter(first_user=current_user)
@@ -29,15 +30,20 @@ def feed(request):
         friend_posts = Post.objects.filter(user=friend_row.second_user)
         all_posts.extend(friend_posts)
 
-    return render(request, 'feed.html', {'posts': all_posts, 'comment_form': comments_form})
+        friend_messages = Message.objects.filter(sender=current_user, receiver=friend_row.second_user)
+        all_messages.extend(friend_messages)
+
+    return render(request, 'feed.html', {'posts': all_posts, 'messages': all_messages, 'comment_form': comments_form})
 
 
 @login_required(login_url='/login/')
 def friends(request):
-    friends = Friendship.objects.filter(first_user=request.user.email)
+
+    friends = Friendship.objects.filter(first_user__user_email=request.user.email)
     users = []
     for friend in friends:
         users.append(friend.second_user)
+
     return render(request, 'friends.html', {'users': users})
 
 
@@ -91,22 +97,24 @@ def edit_profile(request):
 
                 success = True
 
-    '''
+    # Password
     if request.method == "POST" and 'password' in request.POST:
 
         form = ProfilePasswordForm(request.POST)
 
         if form.is_valid():
 
-            form.save()
             password = request.POST['password']
 
             if password:
-                user.password = password
+
+                request.user.set_password(password)
+                request.user.save()
+
+                user.update_password(password)
                 user.save()
 
                 success = True
-                '''
 
     if not success:
 
@@ -155,15 +163,12 @@ def register(request):
             raw_password = form.cleaned_data.get('password1')
 
             # Authenticate user
-            user = authenticate(username=username, password=raw_password, )
+            user = authenticate(username=username, password=raw_password)
             login(request, user)
 
             # Save user if user is authenticated
-            user = User(user_email=user_email, username=username, password=raw_password)
+            user = User(user_email=user_email, username=username, password=raw_password, image="user2.png")
             user.save()
-
-            # Save session
-            # request.user.email = user_email
 
             return render(request, 'startScreen.html')
     else:
@@ -188,7 +193,7 @@ def delete(request):
 
 
 def logout(request):
-    # request.user.email = ""
+
     return redirect('/login')
 
 
@@ -216,14 +221,10 @@ def search(request):
 
             friends = Friendship.objects.filter(first_user=current_user)
 
-            already_follows = len(list(filter(lambda tmp_friend: tmp_friend.second_user.user_email == friend, friends)))
-
-            if already_follows:
+            if friend not in friends:
+                friendship = Friendship(first_user=current_user, second_user=friend_user)
+                friendship.save()
                 return redirect('/friends/')
-
-            friendship = Friendship(first_user=current_user, second_user=friend_user)
-            friendship.save()
-            return redirect('/friends/')
 
     if 'remove_friend' in request.POST:
 
@@ -290,3 +291,19 @@ def post_details(request, post_id):
     params = {'post': post, 'comments': comments}
 
     return render(request, 'post_details.html', params)
+
+
+def messages(request):
+
+    friends = Friendship.objects.filter(first_user__user_email=request.user.email)
+    users = []
+    for friend in friends:
+        users.append(friend.second_user)
+
+    return render(request, 'messages.html', {"users": users})
+
+
+def messages_with(request, username):
+
+    messages_with_user = Message.objects.filter(receiver__username=username, sender__username=request.user.username) | Message.objects.filter(receiver__username=request.user.username, sender__username=username)
+    return render(request, 'messages_with.html', {'messages': messages_with_user})
