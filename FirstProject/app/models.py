@@ -13,8 +13,9 @@ class User(models.Model):
 
 
 class Friendship(models.Model):
-    first_user = models.CharField(max_length=80)
-    second_user = models.CharField(max_length=80)
+    id = models.AutoField(primary_key=True)
+    first_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_user')
+    second_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_user')
 
 
 class Post(models.Model):

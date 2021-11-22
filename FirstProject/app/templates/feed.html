@@ -1,52 +1,46 @@
 {% extends "layout.html" %}
+{% load static %}
 
 {% block content %}
 
-<div class="py-5">
-    <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
+<div class="container my-3">
 
-            {% for post in posts %}
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img">
-                            <rect width="100%" height="100%" fill="#55595c"></rect>
-                        </svg>
-                        <div class="card-body">
-                            <p class="card-text">Description</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-primary">Like</button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary">Comment</button>
-                                </div>
-                                <small class="text-muted px-4">Date</small>
-                            </div>
+    <h2 class="my-5 fw-bolder">Feed</h2>
+
+    {% for post in posts %}
+        <div class="col my-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <div class="d-flex flex-row">
+                        <div class="p-1">
+                            {% if post.user.image %}
+                                <img src="/media/{{ post.user.image }}" class="rounded-circle" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
+                            {% else %}
+                                <img src="{% static "imgs/user2.png" %}" class="rounded-circle" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
+                            {% endif %}
+                        </div>
+                        <div class="p-2 my-auto">
+                            <p class="m-0 p-0"><strong>{{ post.user.username }}</strong> posted...</p>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
-
-
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img">
-                            <rect width="100%" height="100%" fill="#55595c"></rect>
-                        </svg>
-                        <div class="card-body">
-                            <p class="card-text">Description</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-primary">Like</button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary">Comment</button>
-                                </div>
-                                <small class="text-muted px-4">Date</small>
-                            </div>
+                <img src="/media/{{ post.file.name }}" class="card-img-top py-3" style="object-fit: scale-down; max-height: 250px" alt="Post Image">
+                <div class="card-body">
+                    <p class="card-text">{{ post.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <form action="/post_details/{{ post.post_id }}">
+                                {% csrf_token %}
+                                <button id="view-button" type="submit" class="btn btn-sm btn-primary">View</button>
+                            </form>
+                            <button type="button" class="btn btn-sm btn-outline-primary">Comment</button>
                         </div>
+                        <small class="text-muted px-4">{{ post.date }}</small>
                     </div>
                 </div>
-
+            </div>
         </div>
-    </div>
+    {% endfor %}
 </div>
 
 {% endblock %}

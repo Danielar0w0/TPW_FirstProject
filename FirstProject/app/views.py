@@ -1,7 +1,3 @@
-from datetime import timezone
-
-from django.db.models import Q
-
 from app.models import Post, User, Comment, Friendship
 from django.shortcuts import render, redirect
 from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm, ProfileImageForm, ProfilePasswordForm
@@ -22,7 +18,17 @@ def start_screen(request):
 
 @login_required(login_url='/login/')
 def feed(request):
-    return render(request, 'feed.html')
+
+    all_posts = []
+
+    current_user = User.objects.get(user_email=request.user.email)
+    friends_join = Friendship.objects.select_related('first_user', 'second_user').filter(first_user=current_user)
+
+    for friend_row in friends_join:
+        friend_posts = Post.objects.filter(user=friend_row.second_user)
+        all_posts.extend(friend_posts)
+
+    return render(request, 'feed.html', {'posts': all_posts})
 
 
 @login_required(login_url='/login/')
@@ -103,13 +109,12 @@ def edit_profile(request):
 
     if not success:
 
-        form_image = ProfileImageForm();
-        form_password = ProfilePasswordForm();
+        form_image = ProfileImageForm()
+        form_password = ProfilePasswordForm()
 
         return render(request, 'edit_profile.html', {'formImage': form_image, 'formPassword': form_password})
 
     return render(request, 'profile.html', {"user": user})
-
 
 
 @login_required(login_url='/login/')
@@ -180,49 +185,77 @@ def delete(request):
 
     return redirect('/profile')
 
+
 def logout(request):
     # request.user.email = ""
     return redirect('/login')
 
+
 def search(request):
+
     if 'query' in request.POST:
+
         search_term = request.POST['query']
+
         if search_term:
+
             users = User.objects.filter(username__icontains=search_term).exclude(user_email=request.user.email)
             friends = [f.second_user for f in Friendship.objects.filter(first_user=request.user.email)]
+
             return render(request, 'search_results.html', {'users': users, 'friends': friends, 'search_term': search_term})
 
     if 'add_friend' in request.POST:
+
         friend = request.POST['add_friend']
+
         if friend:
-            friends = Friendship.objects.filter(first_user=request.user.email)
+
+            current_user = User.objects.get(user_email=request.user.email)
+            friend_user = User.objects.get(user_email=friend)
+
+            friends = Friendship.objects.filter(first_user=current_user)
+
             if friend not in friends:
-                friendship = Friendship(first_user=request.user.email, second_user=friend)
+                friendship = Friendship(first_user=current_user, second_user=friend_user)
                 friendship.save()
                 return redirect('/friends/')
 
     if 'remove_friend' in request.POST:
+
         friend = request.POST['remove_friend']
+
         if friend:
-            friends = Friendship.objects.filter(first_user=request.user.email, second_user=friend)
+
+            current_user = User.objects.get(user_email=request.user.email)
+            friend_user = User.objects.get(user_email=friend)
+
+            friends = Friendship.objects.filter(first_user=current_user, second_user=friend_user)
+
             for f in friends:
                 f.delete()
             return redirect('/friends/')
 
     if 'query_friend' in request.POST:
+
         search_term = request.POST['query_friend']
+
         if search_term:
             # search by username
             users = User.objects.filter(username__icontains=search_term).exclude(user_email=request.user.email)
+            current_user = User.objects.get(user_email=request.user.email)
+
             friends = []
+
             for user in users:
-                friend = Friendship.objects.filter(first_user=request.user.email, second_user=user.user_email)
+                friend = Friendship.objects.filter(first_user=current_user, second_user=user)
                 if friend:
                     friends.append(user)
             return render(request, 'friends.html', {'users': friends})
+
         return redirect('/friends/')
 
     return render(request, 'search_results.html', {'users': []})
+
 
 def comment(request):
 
