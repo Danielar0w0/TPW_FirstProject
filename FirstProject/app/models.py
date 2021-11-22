@@ -7,6 +7,10 @@ class User(models.Model):
     password = models.CharField(max_length=80)
     image = models.FileField()
 
+    def update_image(self, file):
+        self.image.storage.delete(self.image.name)
+        self.image = file
+
 
 class Friendship(models.Model):
     first_user = models.CharField(max_length=80)

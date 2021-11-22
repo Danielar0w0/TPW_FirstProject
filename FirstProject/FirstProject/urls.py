@@ -28,6 +28,7 @@ urlpatterns = [
     path('feed/', views.feed),
     path('friends/', views.friends),
     path('profile/', views.profile),
+    path('profile/edit/', views.edit_profile),
     path('create/', views.create),
     path('login/', auth_views.LoginView.as_view(template_name='login.html')),
     path('search/', views.search),

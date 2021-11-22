@@ -35,3 +35,18 @@ class CommentForm(forms.Form):
 
 class DeletePostForm(forms.Form):
     post_id = forms.IntegerField()
+
+
+class ProfileImageForm(forms.Form):
+    image = forms.FileField(widget=forms.FileInput(
+        attrs={
+            'class': 'form-control',
+            'id': 'image',
+            'name': 'input_file',
+            'accept': 'image/*'
+        }
+    ))
+
+
+class ProfilePasswordForm(forms.Form):
+    password = forms.CharField(max_length=80)
