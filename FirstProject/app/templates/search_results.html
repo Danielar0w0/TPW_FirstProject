@@ -9,8 +9,8 @@
                 {% if users|length > 0 %}
                     {% for user in users %}
                         <div class="col">
-                            <div class="card shadow-sm">
-                                <img src="/media/{{ user.image.name }}">
+                            <div class="card shadow-sm" style="border: none">
+                                <img src="/media/{{ user.image.name }}" onerror="this.onerror=null;this.src='/static/imgs/{{ user.image.name }}';">
                                 <div class="card-body">
                                     <p class="card-text"> {{ user.username }} </br>
                                         <small class="text-muted">Description</small>
