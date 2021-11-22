@@ -306,3 +306,19 @@ def messages_with(request, username):
 
     messages_with_user = Message.objects.filter(receiver__username=username, sender__username=request.user.username) | Message.objects.filter(receiver__username=request.user.username, sender__username=username)
     return render(request, 'messages_with.html', {'messages': messages_with_user})
+
+def user_profile(request, email):
+    user = User.objects.get(user_email=email)
+    comment_form = CommentForm()
+
+    try:
+        posts = Post.objects.filter(user=user)
+    except ObjectDoesNotExist:
+        posts = []
+
+    params = {
+        'user': user,
+        'posts': posts,
+        'form': comment_form
+    }
+    return render(request, 'profile.html', params)

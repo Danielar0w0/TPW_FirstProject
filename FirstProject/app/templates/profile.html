@@ -10,10 +10,12 @@
                <img src="/media/{{ user.image.name }}" style="width: 10vw; height: 9vw; object-fit: cover" class="rounded-circle">
                <h2 class="cover-heading pt-2">{{ user.username | upper }}</h2>
                <p class="text-secondary cover-heading mb-5">{{ user.user_email }}</p>
-               <p class="lead">
-                   <a href="/create/" class="btn btn-lg btn-primary">Create post</a>
-                   <a href="/profile/edit/" class="btn btn-lg btn-outline-primary">Edit profile</a>
-               </p>
+               {% if user.user_email == request.user.email %}
+                   <p class="lead">
+                       <a href="/create/" class="btn btn-lg btn-primary">Create post</a>
+                       <a href="/profile/edit/" class="btn btn-lg btn-outline-primary">Edit profile</a>
+                   </p>
+               {% endif %}
           </div>
 
            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
@@ -34,7 +36,9 @@
                                             <button id="view-button" type="submit" class="btn btn-sm btn-primary">View</button>
                                         </form>
                                         <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#commentsModal">Comment</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#deleteModal{{ post.post_id }}">Delete</button>
+                                        {% if user.user_email == request.user.email %}
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#deleteModal{{ post.post_id }}">Delete</button>
+                                        {% endif %}
                                    </div>
                                    <small class="text-muted px-1"> {{ post.date }}</small>
 

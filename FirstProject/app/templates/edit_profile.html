@@ -2,48 +2,49 @@
 {% load static %}
 
 {% block content %}
+    <div class="container-fluid">
+        <div class="row d-flex justify-content-center pt-5 text-center">
+            <div class="col-2">
 
-    <div class="row d-flex justify-content-center pt-5 text-center">
-        <div class="col-2">
+                <img id="image-preview" src="{% static 'imgs/free-love-message-icon-2946-thumb.png' %}" class="rounded" style="max-height: 25vh"/>
 
-            <img id="image-preview" src="{% static 'imgs/free-love-message-icon-2946-thumb.png' %}" class="rounded" style="max-height: 25vh"/>
+                <form action="." method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
 
-            <form action="." method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+                    <div class="form-group py-4">
+                        <h5>Profile picture</h5>
 
-                <div class="form-group py-4">
-                    <h5>Profile picture</h5>
+                        <div class="custom-file pt-4">
+                            {{ formImage.image }}
+                        </div>
 
-                    <div class="custom-file pt-4">
-                        {{ formImage.image }}
                     </div>
 
-                </div>
+                     <div class="form-group pt-4">
+                         <input class="btn btn-primary" type="submit" value="Update picture">
+                     </div>
+                </form>
 
-                 <div class="form-group pt-4">
-                     <input class="btn btn-primary" type="submit" value="Update picture">
-                 </div>
-            </form>
+                <form action="." method="POST">
+                    {% csrf_token %}
 
-            <form action="." method="POST">
-                {% csrf_token %}
+                    <div class="form-group py-4">
+                        <h5>Password</h5>
 
-                <div class="form-group py-4">
-                    <h5>Password</h5>
+                        <div class="custom-file pt-4">
+                            {{ formPassword.password }}
+                        </div>
 
-                    <div class="custom-file pt-4">
-                        {{ formPassword.password }}
                     </div>
 
-                </div>
+                     <div class="form-group pt-4">
+                         <input class="btn btn-primary" type="submit" value="Change password">
+                     </div>
+                </form>
 
-                 <div class="form-group pt-4">
-                     <input class="btn btn-primary" type="submit" value="Change password">
-                 </div>
-            </form>
+            </div>
 
         </div>
-
     </div>
 
    <script>

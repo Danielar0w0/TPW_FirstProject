@@ -38,6 +38,6 @@ urlpatterns = [
     path('register/', views.register),
     path('delete/', views.delete),
     path('messages/', views.messages),
-    path('messages/<str:username>', views.messages_with)
-    # path('profile/<str:email>', )
+    path('messages/<str:username>', views.messages_with),
+    path('profile/<str:email>', views.user_profile)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
