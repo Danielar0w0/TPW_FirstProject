@@ -2,7 +2,7 @@ from datetime import timezone
 
 from django.db.models import Q
 
-from app.models import Post, User,Comment, Friendship
+from app.models import Post, User, Comment, Friendship
 from django.shortcuts import render, redirect
 from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm
 from django.contrib.auth.decorators import login_required
@@ -143,23 +143,23 @@ def search(request):
     if 'query' in request.POST:
         search_term = request.POST['query']
         if search_term:
-            users = User.objects.filter(username__icontains=search_term).exclude(user_email=request.session['user'])
-            friends = [f.second_user for f in Friendship.objects.filter(first_user=request.session['user'])]
+            users = User.objects.filter(username__icontains=search_term).exclude(user_email=request.user.email)
+            friends = [f.second_user for f in Friendship.objects.filter(first_user=request.user.email)]
             return render(request, 'search_results.html', {'users': users, 'friends': friends})
 
     if 'add_friend' in request.POST:
         friend = request.POST['add_friend']
         if friend:
-            friends = Friendship.objects.filter(first_user=request.session['user'])
+            friends = Friendship.objects.filter(first_user=request.user.email)
             if friend not in friends:
-                friendship = Friendship(first_user=request.session['user'], second_user=friend)
+                friendship = Friendship(first_user=request.user.email, second_user=friend)
                 friendship.save()
                 return redirect('/friends/')
 
     if 'remove_friend' in request.POST:
         friend = request.POST['remove_friend']
         if friend:
-            friends = Friendship.objects.filter(first_user=request.session['user'], second_user=friend)
+            friends = Friendship.objects.filter(first_user=request.user.email, second_user=friend)
             for f in friends:
                 f.delete()
             return redirect('/friends/')
