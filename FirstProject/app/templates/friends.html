@@ -6,9 +6,9 @@
 <div class="py-5">
     <div class="container">
         <div class="container-fluid py-5">
-             <form action="/search" method="post" class="px-4 input-group w-auto">
+             <form action="/search/" method="post" class="px-4 input-group w-auto">
                  {% csrf_token %}
-                 <input type="search" name="query" class="form-control rounded" placeholder="Search for your friends" aria-label="Search"/>
+                 <input type="search" name="query_friend" class="form-control rounded" placeholder="Search for your friends" aria-label="Search"/>
 
                  <button type="button" class="btn btn-primary">
                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -22,9 +22,9 @@
                 {% for friend in users %}
                     <div class="col">
                         <div class="card shadow-sm">
-                            <img src="{% static 'imgs/user.png' %}" style="width: 100%; height: 80%; object-fit: cover">
+                            <img src="/media/{{ friend.image.name }}">
                             <div class="card-body">
-                                <p class="card-text"> {{ friend.0.username }} </br>
+                                <p class="card-text"> {{ friend.username }} </br>
                                     <small class="text-muted">Description</small>
                                 </p>
 

@@ -4,7 +4,7 @@ from django.db.models import Q
 
 from app.models import Post, User, Comment, Friendship
 from django.shortcuts import render, redirect
-from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm
+from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm, ProfileImageForm, ProfilePasswordForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 
@@ -30,9 +30,8 @@ def friends(request):
     friends = Friendship.objects.filter(first_user=request.user.email)
     users = []
     for friend in friends:
-        users.append(User.objects.filter(user_email=friend.second_user))
+        users.append(User.objects.get(user_email=friend.second_user))
     return render(request, 'friends.html', {'users': users})
-
 
 
 @login_required(login_url='/login/')
@@ -47,11 +46,6 @@ def profile2(request, user_email):
 @login_required(login_url='/login/')
 def profile(request):
 
-    # try:
-    #    user = User.objects.get(user_email=user_email)
-    # except ObjectDoesNotExist:
-    #    return redirect('/login')
-
     user = User.objects.get(user_email=request.user.email)
     comment_form = CommentForm()
 
@@ -61,11 +55,61 @@ def profile(request):
         posts = []
 
     params = {
+        'user': user,
         'posts': posts,
         'form': comment_form
     }
 
     return render(request, 'profile.html', params)
+
+
+def edit_profile(request):
+
+    success = False
+    user = User.objects.get(user_email=request.user.email)
+
+    # Image
+    if request.method == "POST" and 'image' in request.FILES:
+
+        form = ProfileImageForm(request.POST, request.FILES)
+
+        if form.is_valid():
+
+            file = request.FILES['image']
+
+            if file:
+                user.image = file
+                user.update_image(file)
+                user.save()
+
+                success = True
+
+    '''
+    if request.method == "POST" and 'password' in request.POST:
+
+        form = ProfilePasswordForm(request.POST)
+
+        if form.is_valid():
+
+            form.save()
+            password = request.POST['password']
+
+            if password:
+                user.password = password
+                user.save()
+
+                success = True
+                '''
+
+    if not success:
+
+        form_image = ProfileImageForm();
+        form_password = ProfilePasswordForm();
+
+        return render(request, 'edit_profile.html', {'formImage': form_image, 'formPassword': form_password})
+
+    return render(request, 'profile.html', {"user": user})
+
 
 
 @login_required(login_url='/login/')
@@ -74,7 +118,7 @@ def create(request):
         form = PostForm(request.POST, request.FILES)
 
         if form.is_valid():
-            user_email = request.session["user"]
+            user_email = request.user.email
             description = request.POST["description"]
             file = request.FILES['file']
 
@@ -113,7 +157,7 @@ def register(request):
             user.save()
 
             # Save session
-            request.session["user"] = user_email
+            # request.user.email = user_email
 
             return render(request, 'startScreen.html')
     else:
@@ -137,7 +181,7 @@ def delete(request):
     return redirect('/profile')
 
 def logout(request):
-    request.session["user"] = ""
+    # request.user.email = ""
     return redirect('/login')
 
 def search(request):
@@ -146,7 +190,7 @@ def search(request):
         if search_term:
             users = User.objects.filter(username__icontains=search_term).exclude(user_email=request.user.email)
             friends = [f.second_user for f in Friendship.objects.filter(first_user=request.user.email)]
-            return render(request, 'search_results.html', {'users': users, 'friends': friends})
+            return render(request, 'search_results.html', {'users': users, 'friends': friends, 'search_term': search_term})
 
     if 'add_friend' in request.POST:
         friend = request.POST['add_friend']
@@ -164,6 +208,19 @@ def search(request):
             for f in friends:
                 f.delete()
             return redirect('/friends/')
+
+    if 'query_friend' in request.POST:
+        search_term = request.POST['query_friend']
+        if search_term:
+            # search by username
+            users = User.objects.filter(username__icontains=search_term).exclude(user_email=request.user.email)
+            friends = []
+            for user in users:
+                friend = Friendship.objects.filter(first_user=request.user.email, second_user=user.user_email)
+                if friend:
+                    friends.append(user)
+            return render(request, 'friends.html', {'users': friends})
+        return redirect('/friends/')
 
     return render(request, 'search_results.html', {'users': []})
 
