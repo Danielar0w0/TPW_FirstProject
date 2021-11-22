@@ -8,7 +8,7 @@
     <h2 class="my-5 fw-bolder">Feed</h2>
 
     {% for post in posts %}
-        <div class="col my-4">
+        <div class="my-4">
             <div class="card shadow-sm">
                 <div class="card-header">
                     <div class="d-flex flex-row">
@@ -33,9 +33,30 @@
                                 {% csrf_token %}
                                 <button id="view-button" type="submit" class="btn btn-sm btn-primary">View</button>
                             </form>
-                            <button type="button" class="btn btn-sm btn-outline-primary">Comment</button>
+                            <button href="#comments_div_{{ post.post_id }}" type="button" class="btn btn-sm btn-outline-primary" data-toggle="collapse">Comment</button>
                         </div>
                         <small class="text-muted px-4">{{ post.date }}</small>
+                    </div>
+                    <div id="comments_div_{{ post.post_id }}" class="row collapse m-3">
+                        <p class="fw-bolder p-0 mb-2">Commenting as {{ user.username }}</p>
+
+                        <form action="/comment/" method="post" class="form-horizontal">
+
+                            {% csrf_token %}
+                            <div class="row">
+                                {{ comment_form.comment_content }}
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-2 m-0 p-0">
+                                    <input type="submit" value="Save" class="btn btn-primary input-block-level m-0" />
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="post_id" value="{{ post.post_id }}">
+                            <input type="hidden" name="user_email" value="{{ user.email }}">
+
+                        </form>
+
                     </div>
                 </div>
             </div>
