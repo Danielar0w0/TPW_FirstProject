@@ -27,8 +27,11 @@ def feed(request):
 
 @login_required(login_url='/login/')
 def friends(request):
-    friends = Friendship.objects.filter(first_user=request.session['user'])
-    return render(request, 'friends.html', {'users': friends})
+    friends = Friendship.objects.filter(first_user=request.user.email)
+    users = []
+    for friend in friends:
+        users.append(User.objects.filter(user_email=friend.second_user))
+    return render(request, 'friends.html', {'users': users})
 
 
 
@@ -136,8 +139,6 @@ def delete(request):
 def logout(request):
     request.session["user"] = ""
     return redirect('/login')
-
-
 
 def search(request):
     if 'query' in request.POST:
