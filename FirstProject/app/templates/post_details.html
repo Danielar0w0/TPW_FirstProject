@@ -9,18 +9,14 @@
 
         <div class="row">
 
-            <div class="col-9 mt-5 mb-5">
-                <img src="/media/{{ post.file.name }}" class="card-img-top" height="225" style="object-fit: contain">
+            <div class="col-9 mt-5 mb-5 d-flex justify-content-center">
+                <img src="/media/{{ post.file.name }}" class="rounded" height="225" style="object-fit: contain">
             </div>
             <div class="col-2">
 
                 <div class="row mt-5 text-light">
                     <div class="col-4">
-                        {% if post.user.image %}
-                            <img src="/media/{{ post.user.image }}" class="rounded" height="50" style="object-fit: contain">
-                        {% else %}
-                            <img src="{% static "imgs/user.png" %}" class="rounded" height="50" style="object-fit: contain">
-                        {% endif %}
+                        <img src="/media/{{ post.user.image }}" class="rounded-circle" height="50" style="object-fit: contain">
                     </div>
                     <div class="col-7">
                         <p class="fw-bold" style="font-size: 1.2rem">{{ post.user.username }}</p>

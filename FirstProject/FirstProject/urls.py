@@ -36,6 +36,8 @@ urlpatterns = [
     path('post_details/<int:post_id>', views.post_details),
     path('logout/', views.logout),
     path('register/', views.register),
-    path('delete/', views.delete)
+    path('delete/', views.delete),
+    path('messages/', views.messages),
+    path('messages/<str:username>', views.messages_with)
     # path('profile/<str:email>', )
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

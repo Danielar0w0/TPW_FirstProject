@@ -49,4 +49,13 @@ class ProfileImageForm(forms.Form):
 
 
 class ProfilePasswordForm(forms.Form):
-    password = forms.CharField(max_length=80)
+    password = forms.CharField(max_length=80, widget=forms.PasswordInput(
+        attrs={
+            'class': 'form-control'
+        }
+    ))
+
+
+class MessageForm(forms.Form):
+
+    content = forms.CharField(max_length=256)
