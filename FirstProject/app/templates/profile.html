@@ -16,6 +16,7 @@
                      class="rounded-circle" onerror="this.onerror=null; this.src='/static/imgs/user2.png'">
                 <h2 class="cover-heading pt-2">{{ user.username | upper }}</h2>
                 <p class="text-secondary cover-heading mb-5">{{ user.user_email }}</p>
+                <p class="lead">Followers {{ followers }} | Following {{ following }}</p>
                 {% if user.user_email == request.user.email %}
                     <p class="lead">
                         <a href="/create/" class="btn btn-lg btn-primary">Create post</a>
