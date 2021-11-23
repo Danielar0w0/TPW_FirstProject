@@ -21,21 +21,13 @@
                                     <p class="card-text text-end" style="color: white"> {{ message.content }}</p>
                                 </div>
                                 <div class="col-1">
-                                    {% if message.sender.image %}
-                                        <img src="/media/{{ message.sender.image }}" class="rounded-circle" style="object-fit:cover; width: 70px; height: 70px;">
-                                    {% else %}
-                                        <img src="{% static "imgs/user2.png" %}" class="rounded-circle" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
-                                    {% endif %}
+                                    <img src="/media/{{ message.sender.image }}" class="rounded-circle" style="object-fit:cover; width: 70px; height: 70px;" onerror="this.onerror=null;this.src='/static/imgs/user2.png';">
                                 </div>
                             </div>
                         {% else %}
                             <div class="row py-2 my-2">
                                 <div class="col-1">
-                                    {% if message.sender.image %}
-                                        <img src="/media/{{ message.sender.image }}" class="rounded-circle" style="object-fit:cover; width: 70px; height: 70px;">
-                                    {% else %}
-                                        <img src="{% static "imgs/user2.png" %}" class="rounded-circle" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
-                                    {% endif %}
+                                    <img src="/media/{{ message.sender.image }}" class="rounded-circle" style="object-fit:cover; width: 70px; height: 70px;" onerror="this.onerror=null;this.src='/static/imgs/user2.png';">
                                 </div>
                                 <div class="col-3 my-auto py-3 rounded" style="background-color: rgba(0,48,106,0.48);">
                                     <p class="card-text" style="color: white"> {{ message.content }}</p>
