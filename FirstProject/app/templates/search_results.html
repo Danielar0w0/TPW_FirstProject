@@ -9,8 +9,8 @@
                 {% if users|length > 0 %}
                     {% for user in users %}
                         <div class="col">
-                            <div class="card shadow-sm">
-                                <img src="/media/{{ user.image.name }}">
+                            <div class="card shadow-sm" style="border: none">
+                                <img src="/media/{{ user.image.name }}" onerror="this.onerror=null;this.src='/static/imgs/{{ user.image.name }}';">
                                 <div class="card-body">
                                     <p class="card-text"> {{ user.username }} </br>
                                         <small class="text-muted">Description</small>
@@ -18,14 +18,14 @@
 
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-primary">Check profile<a href="/profile/{{ user.username }}" style="text-decoration: none;"></a></button>
+                                            <button type="button" class="btn btn-sm btn-primary"><a href="/profile/{{ user.user_email }}" style="text-decoration: none; color: white;">Check profile</a></button>
                                         </div>
                                     </div>
 
                                     <div>
                                         <form action="." method="post" >
                                             {% csrf_token %}
-                                            {% if user.user_email in friends %}
+                                            {% if user in friends %}
                                                 <input type="hidden" name="remove_friend" value="{{ user.user_email }}">
                                                 <input type="submit" value="Unfollow" class="btn btn-primary")>
                                             {% else %}

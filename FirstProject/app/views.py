@@ -24,6 +24,7 @@ def start_screen(request):
 def feed(request):
 
     all_posts = []
+    comments_form = CommentForm()
     all_messages = []
 
     current_user = User.objects.get(user_email=request.user.email)
@@ -36,7 +37,7 @@ def feed(request):
         friend_messages = Message.objects.filter(sender=current_user, receiver=friend_row.second_user)
         all_messages.extend(friend_messages)
 
-    return render(request, 'feed.html', {'posts': all_posts, 'messages': all_messages, 'user': current_user})
+    return render(request, 'feed.html', {'posts': all_posts, 'messages': all_messages, 'comment_form': comments_form, 'user': current_user})
 
 
 @login_required(login_url='/login/')
@@ -65,6 +66,8 @@ def profile2(request, user_email):
 @login_required(login_url='/login/')
 def profile(request):
     user = User.objects.get(user_email=request.user.email)
+    following = len(Friendship.objects.filter(first_user=user))
+    followers = len(Friendship.objects.filter(second_user=user))
     comment_form = CommentForm()
 
     try:
@@ -75,7 +78,9 @@ def profile(request):
     params = {
         'user': user,
         'posts': posts,
-        'form': comment_form
+        'form': comment_form,
+        'following': following,
+        'followers': followers
     }
 
     return render(request, 'profile.html', params)
@@ -318,7 +323,7 @@ def messages(request):
 
 
 def messages_with(request, username):
-
+    
     user = User.objects.get(user_email=request.user.email)
 
     if request.method == 'POST':
@@ -351,3 +356,24 @@ def messages_with(request, username):
     }
 
     return render(request, 'messages_with.html', params)
+
+def user_profile(request, email):
+
+    user = User.objects.get(user_email=email)
+    comment_form = CommentForm()
+    following = len(Friendship.objects.filter(first_user=user))
+    followers = len(Friendship.objects.filter(second_user=user))
+
+    try:
+        posts = Post.objects.filter(user=user)
+    except ObjectDoesNotExist:
+        posts = []
+
+    params = {
+        'user': user,
+        'posts': posts,
+        'form': comment_form,
+        'following': following,
+        'followers': followers
+    }
+    return render(request, 'profile.html', params)

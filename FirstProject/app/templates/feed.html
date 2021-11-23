@@ -7,47 +7,57 @@
 
     <h2 class="my-5 fw-bolder">Feed</h2>
 
-    <div class="col-9">
-        {% for post in posts %}
-            <div class="row my-4">
-                <div class="card shadow-sm">
-                    <div class="card-header">
-                        <div class="d-flex flex-row">
-                            <div class="p-1">
-                                {% if post.user.image %}
-                                    <img src="/media/{{ post.user.image }}" class="rounded-circle" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
-                                {% else %}
-                                    <img src="{% static "imgs/user2.png" %}" class="rounded-circle" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
-                                {% endif %}
-                            </div>
-                            <div class="p-2 my-auto">
-                                <p class="m-0 p-0"><strong>{{ post.user.username }}</strong> posted...</p>
-                            </div>
+    {% for post in posts %}
+        <div class="my-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <div class="d-flex flex-row">
+                        <div class="p-1">
+                            <img src="/media/{{ post.user.image.name }}" onerror="this.onerror=null;this.src='/static/imgs/{{ post.user.image.name }}';" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
                         </div>
-                    </div>
-                    <img src="/media/{{ post.file.name }}" class="card-img-top py-3" style="object-fit: scale-down; max-height: 250px" alt="Post Image">
-                    <div class="card-body">
-                        <p class="card-text">{{ post.description }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <form action="/post_details/{{ post.post_id }}">
-                                    {% csrf_token %}
-                                    <button id="view-button" type="submit" class="btn btn-sm btn-primary">View</button>
-                                </form>
-                                <button type="button" class="btn btn-sm btn-outline-primary">Comment</button>
-                            </div>
-                            <small class="text-muted px-4">{{ post.date }}</small>
+                        <div class="p-2 my-auto">
+                            <p class="m-0 p-0"><strong>{{ post.user.username }}</strong> posted...</p>
                         </div>
                     </div>
                 </div>
+                <img src="/media/{{ post.file.name }}" class="card-img-top py-3" style="object-fit: scale-down; max-height: 250px" alt="Post Image">
+                <div class="card-body">
+                    <p class="card-text">{{ post.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <form action="/post_details/{{ post.post_id }}">
+                                {% csrf_token %}
+                                <button id="view-button" type="submit" class="btn btn-sm btn-primary">View</button>
+                            </form>
+                            <button href="#comments_div_{{ post.post_id }}" type="button" class="btn btn-sm btn-outline-primary" data-toggle="collapse">Comment</button>
+                        </div>
+                        <small class="text-muted px-4">{{ post.date }}</small>
+                    </div>
+                    <div id="comments_div_{{ post.post_id }}" class="row collapse m-3">
+                        <p class="fw-bolder p-0 mb-2">Commenting as {{ user.username }}</p>
+
+                        <form action="/comment/" method="post" class="form-horizontal">
+
+                            {% csrf_token %}
+                            <div class="row">
+                                {{ comment_form.comment_content }}
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-2 m-0 p-0">
+                                    <input type="submit" value="Save" class="btn btn-primary input-block-level m-0" />
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="post_id" value="{{ post.post_id }}">
+                            <input type="hidden" name="user_email" value="{{ user.email }}">
+
+                        </form>
+
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    </div>
-    <div class="col-2">
-        {% for message in messages %}
-            <p>OLA</p>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
 </div>
 
 {% endblock %}

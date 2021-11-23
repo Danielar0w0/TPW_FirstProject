@@ -16,7 +16,7 @@
 
                 <div class="row mt-5 text-light">
                     <div class="col-4">
-                        <img src="/media/{{ post.user.image }}" class="rounded-circle" height="50" style="object-fit: contain">
+                        <img src="/media/{{ post.user.image }}" onerror="this.onerror=null;this.src='/static/imgs/{{ post.user.image.name }}';" class="rounded-circle" height="50" style="object-fit: contain">
                     </div>
                     <div class="col-7">
                         <p class="fw-bold" style="font-size: 1.2rem">{{ post.user.username }}</p>
