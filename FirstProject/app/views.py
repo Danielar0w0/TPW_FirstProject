@@ -53,17 +53,6 @@ def friends(request):
 
 
 @login_required(login_url='/login/')
-def profile2(request, user_email):
-    user = User.objects.get(user_email=request.user.email)
-    params = {
-        'posts': Post.objects.get(user_email=user_email),
-        'user': user
-    }
-
-    return render(request, 'profile.html', params)
-
-
-@login_required(login_url='/login/')
 def profile(request):
 
     user = User.objects.get(user_email=request.user.email)
