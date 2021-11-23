@@ -16,13 +16,8 @@
                         <div class="card-header">
                             <div class="d-flex flex-row">
                                 <div class="p-1">
-                                    {% if post.user.image %}
-                                        <img src="/media/{{ post.user.image }}" class="rounded-circle"
-                                             style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
-                                    {% else %}
-                                        <img src="{% static "imgs/user2.png" %}" class="rounded-circle"
-                                             style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
-                                    {% endif %}
+                                    <img src="/media/{{ post.user.image.name }}" style="object-fit: scale-down; max-height: 50px; max-width: 50px;"
+                                         onerror="this.onerror=null; this.src='/static/imgs/user2.png'">
                                 </div>
                                 <div class="p-2 my-auto">
                                     <p class="m-0 p-0"><strong>{{ post.user.username }}</strong> posted...</p>
