@@ -4,18 +4,29 @@
 
     <div class="py-5">
         <div class="container">
+
+            <h2 class="my-5 fw-bolder">Messages</h2>
+
             <div class="row row-cols-1 row-cols-sm-4 row-cols-md-6 g-3">
-                {% for friend in users %}
-                    <div class="col mx-3">
-                        <div class="card d-flex justify-content-center text-center" style="border: none">
-                            <img src="/media/{{ friend.image.name }}" onerror="this.onerror=null;this.src='/static/imgs/{{ friend.image.name }}';" class="rounded-circle">
-                            <div class="card-body">
-                                <p class="card-text"> {{ friend.username }}</p>
-                                <a href="/messages/{{ friend.username }}" class="btn btn-lg btn-outline-primary">Messages</a>
+                {% if users|length > 0 %}
+                    {% for friend in users %}
+                        <div class="col mx-3">
+                            <div class="card d-flex justify-content-center text-center" style="border: none">
+                                <img src="/media/{{ friend.image.name }}"
+                                     onerror="this.onerror=null;this.src='/static/imgs/{{ friend.image.name }}';"
+                                     class="rounded-circle">
+                                <div class="card-body">
+                                    <p class="card-text"> {{ friend.username }}</p>
+                                    <a href="/messages/{{ friend.username }}" class="btn btn-lg btn-outline-primary">Messages</a>
+                                </div>
                             </div>
                         </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="container text-center">
+                        <p class="fw-light">There are no messages to see.</p>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
