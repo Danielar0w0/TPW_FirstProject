@@ -1,6 +1,9 @@
+from django.db.models import Q
+
 from app.models import Post, User, Comment, Friendship, Message
 from django.shortcuts import render, redirect
-from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm, ProfileImageForm, ProfilePasswordForm
+from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm, ProfileImageForm, ProfilePasswordForm, \
+    MessageForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 
@@ -13,7 +16,8 @@ def layout(request):
 
 @login_required(login_url='/login/')
 def start_screen(request):
-    return render(request, 'startScreen.html')
+    user = User.objects.get(user_email=request.user.email)
+    return render(request, 'startScreen.html', {"user": user})
 
 
 @login_required(login_url='/login/')
@@ -32,24 +36,27 @@ def feed(request):
         friend_messages = Message.objects.filter(sender=current_user, receiver=friend_row.second_user)
         all_messages.extend(friend_messages)
 
-    return render(request, 'feed.html', {'posts': all_posts, 'messages': all_messages})
+    return render(request, 'feed.html', {'posts': all_posts, 'messages': all_messages, 'user': current_user})
 
 
 @login_required(login_url='/login/')
 def friends(request):
 
+    user = User.objects.get(user_email=request.user.email)
     friends = Friendship.objects.filter(first_user__user_email=request.user.email)
     users = []
     for friend in friends:
         users.append(friend.second_user)
 
-    return render(request, 'friends.html', {'users': users})
+    return render(request, 'friends.html', {'users': users, 'user': user})
 
 
 @login_required(login_url='/login/')
 def profile2(request, user_email):
+    user = User.objects.get(user_email=request.user.email)
     params = {
-        'posts': Post.objects.get(user_email=user_email)
+        'posts': Post.objects.get(user_email=user_email),
+        'user': user
     }
 
     return render(request, 'profile.html', params)
@@ -57,7 +64,6 @@ def profile2(request, user_email):
 
 @login_required(login_url='/login/')
 def profile(request):
-
     user = User.objects.get(user_email=request.user.email)
     comment_form = CommentForm()
 
@@ -76,7 +82,6 @@ def profile(request):
 
 
 def edit_profile(request):
-
     success = False
     user = User.objects.get(user_email=request.user.email)
 
@@ -106,7 +111,6 @@ def edit_profile(request):
             password = request.POST['password']
 
             if password:
-
                 request.user.set_password(password)
                 request.user.save()
 
@@ -116,17 +120,19 @@ def edit_profile(request):
                 success = True
 
     if not success:
-
         form_image = ProfileImageForm()
         form_password = ProfilePasswordForm()
 
-        return render(request, 'edit_profile.html', {'formImage': form_image, 'formPassword': form_password})
+        return render(request, 'edit_profile.html', {'formImage': form_image, 'formPassword': form_password, 'user': user})
 
     return render(request, 'profile.html', {"user": user})
 
 
 @login_required(login_url='/login/')
 def create(request):
+
+    user = User.objects.get(user_email=request.user.email)
+
     if request.method == "POST" and 'file' in request.FILES:
         form = PostForm(request.POST, request.FILES)
 
@@ -144,17 +150,18 @@ def create(request):
     else:
         form = PostForm()
 
-    return render(request, 'create.html', {"form": form})
+    return render(request, 'create.html', {"form": form, 'user': user})
 
 
 def register(request):
+
+    user = User.objects.get(user_email=request.user.email)
 
     if request.method == 'POST':
 
         form = RegisterForm(request.POST)
 
         if form.is_valid():
-
             form.save()
 
             user_email = form.cleaned_data.get('email')
@@ -169,11 +176,11 @@ def register(request):
             user = User(user_email=user_email, username=username, password=raw_password, image="user2.png")
             user.save()
 
-            return render(request, 'startScreen.html')
+            return render(request, 'startScreen.html', {"user": user})
     else:
         form = RegisterForm()
 
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'register.html', {'form': form, "user": user})
 
 
 def delete(request):
@@ -181,7 +188,6 @@ def delete(request):
         form = DeletePostForm(request.POST)
 
         if form.is_valid():
-
             post_id = form.cleaned_data.get('post_id')
             post = Post.objects.get(post_id=post_id)
 
@@ -192,22 +198,22 @@ def delete(request):
 
 
 def logout(request):
-
     return redirect('/login')
 
 
 def search(request):
 
+    user = User.objects.get(user_email=request.user.email)
     if 'query' in request.POST:
 
         search_term = request.POST['query']
 
         if search_term:
-
             users = User.objects.filter(username__icontains=search_term).exclude(user_email=request.user.email)
             friends = [f.second_user for f in Friendship.objects.filter(first_user=request.user.email)]
 
-            return render(request, 'search_results.html', {'users': users, 'friends': friends, 'search_term': search_term})
+            return render(request, 'search_results.html',
+                          {'users': users, 'friends': friends, 'search_term': search_term, 'user': user})
 
     if 'add_friend' in request.POST:
 
@@ -255,21 +261,19 @@ def search(request):
                 friend = Friendship.objects.filter(first_user=current_user, second_user=user)
                 if friend:
                     friends.append(user)
-            return render(request, 'friends.html', {'users': friends})
+            return render(request, 'friends.html', {'users': friends, 'user': user})
 
         return redirect('/friends/')
 
-    return render(request, 'search_results.html', {'users': []})
+    return render(request, 'search_results.html', {'users': [], 'user': user})
 
 
 def comment(request):
-
     if request.method == 'POST':
 
         form = CommentForm(request.POST)
 
         if form.is_valid():
-
             post_id = request.POST['post_id']
             user_email = request.POST['user_email']
             comment_content = form.cleaned_data.get('comment_content')
@@ -283,26 +287,67 @@ def comment(request):
 
 
 def post_details(request, post_id):
-
+    user = User.objects.get(user_email=request.user.email)
     post = Post.objects.filter(post_id=post_id)[0]
     comments = Comment.objects.filter(post__post_id=post_id)
 
-    params = {'post': post, 'comments': comments}
+    params = {'post': post, 'comments': comments, 'user': user}
 
     return render(request, 'post_details.html', params)
 
 
 def messages(request):
-
+    user = User.objects.get(user_email=request.user.email)
     friends = Friendship.objects.filter(first_user__user_email=request.user.email)
+    messages_user = Message.objects.filter(Q(sender__username=request.user.username) |
+        Q(receiver__username=request.user.username))
+
     users = []
     for friend in friends:
         users.append(friend.second_user)
 
-    return render(request, 'messages.html', {"users": users})
+    for message in messages_user:
+        if message.receiver == request.user.username:
+            if message.sender not in users:
+                users.append(message.sender)
+        elif message.sender == request.user.username:
+            if message.receiver not in users:
+                users.append(message.receiver)
+
+    return render(request, 'messages.html', {"users": users, 'user':user})
 
 
 def messages_with(request, username):
 
-    messages_with_user = Message.objects.filter(receiver__username=username, sender__username=request.user.username) | Message.objects.filter(receiver__username=request.user.username, sender__username=username)
-    return render(request, 'messages_with.html', {'messages': messages_with_user})
+    user = User.objects.get(user_email=request.user.email)
+
+    if request.method == 'POST':
+
+        form = MessageForm(request.POST)
+
+        if form.is_valid():
+            content = request.POST['content']
+            other_user = User.objects.get(username=request.POST['other_user'])
+            current_user = User.objects.get(username=request.user.username)
+
+            message = Message(sender=current_user, receiver=other_user, content=content)
+            message.save()
+
+    else:
+
+        form = MessageForm()
+
+    other_user = User.objects.get(username=username)
+    messages_with_user = Message.objects.filter(Q(receiver__username=username, sender__username=request.user.username) | \
+                         Q(receiver__username=request.user.username, sender__username=username))
+    messages_with_user = Message.objects.all()
+
+    params = {
+        'form': form,
+        'user': user,
+        'current_user': request.user.username,
+        'other_user': other_user,
+        'messages': messages_with_user
+    }
+
+    return render(request, 'messages_with.html', params)

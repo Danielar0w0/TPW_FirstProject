@@ -58,4 +58,9 @@ class ProfilePasswordForm(forms.Form):
 
 class MessageForm(forms.Form):
 
-    content = forms.CharField(max_length=256)
+    content = forms.CharField(max_length=256, widget=forms.Textarea(
+        attrs={
+            'class': 'form-control',
+            'rows': 4
+        }
+    ))

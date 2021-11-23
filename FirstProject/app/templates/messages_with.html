@@ -1,12 +1,72 @@
 {% extends "layout.html" %}
+{% load static %}
 
 {% block content %}
 
 <div class="py-5">
     <div class="container">
-        {% for message in messages %}
-        {% endfor %}
+         <div class="row d-flex justify-content-center text-center">
+                   <img src="/media/{{ other_user.image.name }}" style="width: 6vw; height: 6vw; object-fit: cover" class="rounded-circle">
+                   <h2 class="cover-heading pt-2">{{ other_user.username | upper }}</h2>
+                   <p class="text-secondary cover-heading mb-5">{{ other_user.user_email }}</p>
+         </div>
 
+        {% if messages|length > 0 %}
+            <div class="card py-4" style="background-image: url({% static 'imgs/abstract_polygons_wallpaper_by_cratemuncher-d6ys3ge.png' %}); background-repeat: no-repeat; background-size: cover; border: lightblue">
+                <div class="row d-flex mx-4">
+                    {% for message in messages %}
+                        {% if message.sender.username == current_user %}
+                            <div class="row py-2 my-2 justify-content-end">
+                                <div class="col-3 my-auto py-3 rounded" style="background-color: rgba(0,48,106,0.48);">
+                                    <p class="card-text text-end" style="color: white"> {{ message.content }}</p>
+                                </div>
+                                <div class="col-1">
+                                    {% if message.sender.image %}
+                                        <img src="/media/{{ message.sender.image }}" class="rounded-circle" style="object-fit:cover; width: 70px; height: 70px;">
+                                    {% else %}
+                                        <img src="{% static "imgs/user2.png" %}" class="rounded-circle" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="row py-2 my-2">
+                                <div class="col-1">
+                                    {% if message.sender.image %}
+                                        <img src="/media/{{ message.sender.image }}" class="rounded-circle" style="object-fit:cover; width: 70px; height: 70px;">
+                                    {% else %}
+                                        <img src="{% static "imgs/user2.png" %}" class="rounded-circle" style="object-fit: scale-down; max-height: 50px; max-width: 50px;">
+                                    {% endif %}
+                                </div>
+                                <div class="col-3 my-auto py-3 rounded" style="background-color: rgba(0,48,106,0.48);">
+                                    <p class="card-text" style="color: white"> {{ message.content }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center">
+                <div class="card py-4" style="background-color: #84dbff; border: none">
+                    <h3>No messages</h3>
+                </div>
+            </div>
+
+        {% endif %}
+        <div class="row pt-4">
+            <form action="/messages/{{ other_user.username }}" method="POST">
+                {% csrf_token %}
+                    <div class="col-6 pt-4">
+                        {{ form.content }}
+                    </div>
+
+                <div class="form-group pt-4">
+                    <input type="hidden" name="other_user" value="{{ other_user.username }}">
+                    <input class="btn btn-primary" type="submit" value="Send">
+                </div>
+
+            </form>
+        </div>
     </div>
 </div>
 
