@@ -10,13 +10,13 @@
         <div class="row">
 
             <div class="col-9 mt-5 mb-5 d-flex justify-content-center">
-                <img src="/media/{{ post.file.name }}" class="rounded" style="object-fit: contain; max-width: 95%; max-height: 300px">
+                <img src="/media/{{ post.file.name }}" class="rounded" height="225" style="object-fit: contain">
             </div>
             <div class="col-2">
 
                 <div class="row mt-5 text-light">
                     <div class="col-4">
-                        <img src="/media/{{ post.user.image }}" class="rounded-circle" style="object-fit: cover; max-height: 50px; max-width: 50px">
+                        <img src="/media/{{ post.user.image }}" onerror="this.onerror=null;this.src='/static/imgs/{{ post.user.image.name }}';" class="rounded-circle" height="50" style="object-fit: contain">
                     </div>
                     <div class="col-7">
                         <p class="fw-bold" style="font-size: 1.2rem">{{ post.user.username }}</p>
