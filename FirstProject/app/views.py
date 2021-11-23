@@ -86,6 +86,7 @@ def profile(request):
     return render(request, 'profile.html', params)
 
 
+@login_required(login_url='/login/')
 def edit_profile(request):
 
     success = False
@@ -190,6 +191,7 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 
+@login_required(login_url='/login/')
 def delete(request):
     if request.method == 'POST':
         form = DeletePostForm(request.POST)
@@ -205,11 +207,13 @@ def delete(request):
     return redirect('/profile')
 
 
+@login_required(login_url='/login/')
 def logout(request):
 
     return redirect('/login')
 
 
+@login_required(login_url='/login/')
 def search(request):
 
     user = User.objects.get(user_email=request.user.email)
@@ -278,6 +282,7 @@ def search(request):
     return render(request, 'search_results.html', {'users': [], 'user': user})
 
 
+@login_required(login_url='/login/')
 def comment(request):
 
     if request.method == 'POST':
@@ -301,6 +306,7 @@ def comment(request):
         return redirect(redirect_uri)
 
 
+@login_required(login_url='/login/')
 def post_details(request, post_id):
     user = User.objects.get(user_email=request.user.email)
     post = Post.objects.filter(post_id=post_id)[0]
@@ -311,6 +317,7 @@ def post_details(request, post_id):
     return render(request, 'post_details.html', params)
 
 
+@login_required(login_url='/login/')
 def messages(request):
     user = User.objects.get(user_email=request.user.email)
     friends = Friendship.objects.filter(first_user__user_email=request.user.email)
@@ -328,6 +335,7 @@ def messages(request):
     return render(request, 'messages.html', {"users": users, 'user': user})
 
 
+@login_required(login_url='/login/')
 def messages_with(request, username):
 
     user = User.objects.get(user_email=request.user.email)
@@ -363,6 +371,7 @@ def messages_with(request, username):
     return render(request, 'messages_with.html', params)
 
 
+@login_required(login_url='/login/')
 def user_profile(request, email):
 
     user = User.objects.get(user_email=email)
@@ -393,6 +402,7 @@ def user_profile(request, email):
     return render(request, 'profile.html', params)
 
 
+@login_required(login_url='/login/')
 def unfollow_user(request, email):
 
     if request.method == 'POST':
