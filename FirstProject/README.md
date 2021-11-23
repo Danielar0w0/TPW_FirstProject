@@ -1,20 +1,21 @@
 # Bubble
 
-Rede social para posts de imagens.
+Rede social com publicação/visualização de posts (no formato de imagens) e com um sistema de mensagens para a interação entre diferentes users.
 
 ### Funcionalidades
+
 - Utilizadores sem login:
     - visualizar perfil de utilizadores registados e abrir as suas publicações
-      - ex: entrando em porfile/maria@ua.pt
+      - ex: entrando em profile/maria@ua.pt
 
 
-- Utilizadores normal:
-  - publicação de posts (imagens e a sua descrição)
+- Utilizadores normais:
+  - publicar posts (imagens e descrição)
   - comentar publicações
-  - eliminar publicações
-  - visualização do feed (publicações de quem segue)
-  - pesquisa por todos os utilizadores registados
-  - pesquisa nos utilizadores que seguimos
+  - eliminar as próprias publicações
+  - visualizar o feed (publicações de quem o utilizador segue)
+  - pesquisar por todos os utilizadores registados
+  - pesquisar utilizadores entre os utilizadores que seguimos
   - enviar mensagens a utilizadores que seguimos ou que nos seguem
   - editar perfil (imagem de perfil e password)
   - visitar perfil de outros utilizadores
@@ -22,26 +23,30 @@ Rede social para posts de imagens.
 
 
 - Utilizadores administradores:
-  - eliminar publicações
-  - publicação de posts (imagens e a sua descrição)
+  - publicar posts (imagens e descrição)
   - comentar publicações
-  - eliminar publicações
-  - visualização do feed (publicações de quem segue)
-  - pesquisa por todos os utilizadores registados
-  - pesquisa nos utilizadores que seguimos
+  - eliminar as publicações de qualquer utilizador (função de moderação)
+  - visualizar o feed (publicações de quem o utilizador segue)
+  - pesquisar por todos os utilizadores registados
+  - pesquisar utilizadores entre os utilizadores que seguimos
   - enviar mensagens a utilizadores que seguimos ou que nos seguem
   - editar perfil (imagem de perfil e password)
   - visitar perfil de outros utilizadores
   - seguir/não seguir utilizador
 
+
 ### Contas e passwords
+
+Contas de utilizador normal:
+
 - Danik: passwordadmin
-
 - Daniel: passwordadmin
-
 - manuel: p4ssword1
-
 - maria: p4ssword1
+
+Conta de administrador:
+
+- admin: passwordadmin
 
 ### Autores
 
