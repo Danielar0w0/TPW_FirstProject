@@ -26,7 +26,7 @@
                     {% for friend in users %}
                         <div class="col">
                             <div class="card shadow-sm">
-                                <img src="/media/{{ friend.image.name }}">
+                                <img src="/media/{{ friend.image.name }}" onerror="this.onerror=null; this.src='/static/imgs/user2.png'">
                                 <div class="card-body">
                                     <p class="card-text"> {{ friend.username }} </br>
                                         <small class="text-muted">Description</small>
