@@ -16,7 +16,8 @@ def layout(request):
 
 @login_required(login_url='/login/')
 def start_screen(request):
-    return render(request, 'startScreen.html')
+    user = User.objects.get(user_email=request.user.email)
+    return render(request, 'startScreen.html', {'user': user})
 
 
 @login_required(login_url='/login/')
