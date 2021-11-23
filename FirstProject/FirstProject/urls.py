@@ -34,7 +34,7 @@ urlpatterns = [
     path('search/', views.search),
     path('comment/', views.comment),
     path('post_details/<int:post_id>', views.post_details),
-    path('logout/', views.logout),
+    path('logout/', auth_views.LogoutView.as_view(next_page='/login')),
     path('register/', views.register),
     path('delete/', views.delete),
     path('messages/', views.messages),
