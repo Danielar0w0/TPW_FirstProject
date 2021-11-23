@@ -16,8 +16,7 @@ def layout(request):
 
 @login_required(login_url='/login/')
 def start_screen(request):
-    user = User.objects.get(user_email=request.user.email)
-    return render(request, 'startScreen.html', {"user": user})
+    return render(request, 'startScreen.html')
 
 
 @login_required(login_url='/login/')
@@ -160,8 +159,6 @@ def create(request):
 
 def register(request):
 
-    user = User.objects.get(user_email=request.user.email)
-
     if request.method == 'POST':
 
         form = RegisterForm(request.POST)
@@ -185,7 +182,7 @@ def register(request):
     else:
         form = RegisterForm()
 
-    return render(request, 'register.html', {'form': form, "user": user})
+    return render(request, 'register.html', {'form': form})
 
 
 def delete(request):
