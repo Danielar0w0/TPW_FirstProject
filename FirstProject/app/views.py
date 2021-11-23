@@ -73,6 +73,7 @@ def profile(request):
 
     params = {
         'user': user,
+        'user_profile': user,
         'posts': posts,
         'form': comment_form,
         'following': following,
@@ -205,7 +206,6 @@ def delete(request):
 
 @login_required(login_url='/login/')
 def logout(request):
-
     return redirect('/login')
 
 
@@ -302,9 +302,12 @@ def comment(request):
         return redirect(redirect_uri)
 
 
-@login_required(login_url='/login/')
 def post_details(request, post_id):
-    user = User.objects.get(user_email=request.user.email)
+
+    user = None
+    if request.user.is_authenticated:
+        user = User.objects.get(user_email=request.user.email)
+
     post = Post.objects.filter(post_id=post_id)[0]
     comments = Comment.objects.filter(post__post_id=post_id)
 
@@ -367,27 +370,31 @@ def messages_with(request, username):
     return render(request, 'messages_with.html', params)
 
 
-@login_required(login_url='/login/')
 def user_profile(request, email):
 
     user = User.objects.get(user_email=email)
-    current_user = User.objects.get(user_email=request.user.email)
-    user_friendships = Friendship.objects.filter(first_user=current_user)
     comment_form = CommentForm()
     following = len(Friendship.objects.filter(first_user=user))
     followers = len(Friendship.objects.filter(second_user=user))
+    user_friends = []
+    current_user = None
+
+    if request.user.is_authenticated:
+
+        current_user = User.objects.get(user_email=request.user.email)
+        user_friendships = Friendship.objects.filter(first_user=current_user)
+
+        for user_friendship in user_friendships:
+            user_friends.append(user_friendship.second_user)
 
     try:
         posts = Post.objects.filter(user=user)
     except ObjectDoesNotExist:
         posts = []
 
-    user_friends = []
-    for user_friendship in user_friendships:
-        user_friends.append(user_friendship.second_user)
-
     params = {
-        'user': user,
+        'user': current_user,
+        'user_profile': user,
         'posts': posts,
         'user_friends': user_friends,
         'form': comment_form,
