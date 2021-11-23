@@ -1,3 +1,5 @@
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
+
 from app.models import Post, User, Comment, Friendship, Message
 from django.shortcuts import render, redirect
 from app.forms import PostForm, RegisterForm, DeletePostForm, CommentForm, ProfileImageForm, ProfilePasswordForm
@@ -128,7 +130,9 @@ def edit_profile(request):
 
 @login_required(login_url='/login/')
 def create(request):
+
     if request.method == "POST" and 'file' in request.FILES:
+
         form = PostForm(request.POST, request.FILES)
 
         if form.is_valid():
@@ -178,7 +182,9 @@ def register(request):
 
 
 def delete(request):
+
     if request.method == 'POST':
+
         form = DeletePostForm(request.POST)
 
         if form.is_valid():
@@ -268,8 +274,12 @@ def comment(request):
     if request.method == 'POST':
 
         form = CommentForm(request.POST)
+        redirect_uri = '/profile'
 
         if form.is_valid():
+
+            if 'redirect_uri' in request.POST:
+                redirect_uri = request.POST['redirect_uri']
 
             post_id = request.POST['post_id']
             user_email = request.POST['user_email']
@@ -280,7 +290,7 @@ def comment(request):
             new_comment = Comment(post_id=post_id, content=comment_content, user=user)
             new_comment.save()
 
-        return redirect('/profile')
+        return redirect(redirect_uri)
 
 
 def post_details(request, post_id):
@@ -308,8 +318,12 @@ def messages_with(request, username):
     messages_with_user = Message.objects.filter(receiver__username=username, sender__username=request.user.username) | Message.objects.filter(receiver__username=request.user.username, sender__username=username)
     return render(request, 'messages_with.html', {'messages': messages_with_user})
 
+
 def user_profile(request, email):
+
     user = User.objects.get(user_email=email)
+    current_user = User.objects.get(user_email=request.user.email)
+    user_friendships = Friendship.objects.filter(first_user=current_user)
     comment_form = CommentForm()
 
     try:
@@ -317,9 +331,35 @@ def user_profile(request, email):
     except ObjectDoesNotExist:
         posts = []
 
+    user_friends = []
+    for user_friendship in user_friendships:
+        user_friends.append(user_friendship.second_user)
+
     params = {
         'user': user,
         'posts': posts,
+        'user_friends': user_friends,
         'form': comment_form
     }
+
     return render(request, 'profile.html', params)
+
+
+def unfollow_user(request, email):
+
+    if request.method == 'POST':
+
+        current_user = User.objects.get(user_email=request.user.email)
+
+        try:
+            user_to_unfollow = User.objects.get(user_email=email)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound('Could not find the user {}.'.format(email))
+
+        try:
+            friendship_to_remove = Friendship.objects.get(first_user=current_user, second_user=user_to_unfollow)
+            friendship_to_remove.delete()
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound('You are not following that user.')
+
+        return HttpResponse(content='You have unfollowed {}.'.format(user_to_unfollow.username), content_type='text/plain')

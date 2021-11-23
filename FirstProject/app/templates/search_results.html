@@ -2,10 +2,14 @@
 {% load static %}
 
 {% block content %}
-   <div class="py-5">
-       <div class="container">
-           <h1>Search by: {{ search_term }}</h1>
-           <div class="row row-cols-1 row-cols-sm-4 row-cols-md-6 g-3">
+
+    {% include 'status_message.html' %}
+    <script src="{% static 'scripts/utils.js' %}"></script>
+
+    <div class="py-5">
+        <div class="container">
+            <h1 class="mb-4">Search by: {{ search_term }}</h1>
+            <div class="row row-cols-1 row-cols-sm-3 row-cols-md-4 g-3">
                 {% if users|length > 0 %}
                     {% for user in users %}
                         <div class="col">
@@ -18,22 +22,29 @@
 
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-primary"><a href="/profile/{{ user.user_email }}" style="text-decoration: none; color: white;">Check profile</a></button>
+
+                                            <button class="btn btn-outline-primary"
+                                                    onclick="redirect('/profile/' + '{{ user.user_email }}')">Profile
+                                            </button>
+
+                                            {% if user in friends %}
+                                                <button class="btn btn-primary"
+                                                        onclick="unfollowUser('{{ user.user_email }}', '{{ csrf_token }}')">
+                                                    Unfollow
+                                                </button>
+                                            {% else %}
+                                                <form action="." method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="add_friend"
+                                                           value="{{ user.user_email }}">
+                                                    <input type="submit" value="Follow" class="btn btn-primary">
+                                                </form>
+                                            {% endif %}
+
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <form action="." method="post" >
-                                            {% csrf_token %}
-                                            {% if user in friends %}
-                                                <input type="hidden" name="remove_friend" value="{{ user.user_email }}">
-                                                <input type="submit" value="Unfollow" class="btn btn-primary")>
-                                            {% else %}
-                                                <input type="hidden" name="add_friend" value="{{ user.user_email }}">
-                                                <input type="submit" value="Follow" class="btn btn-primary">
-                                            {% endif %}
-                                        </form>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -42,7 +53,7 @@
                     <p>No results</p>
                 {% endif %}
             </div>
-       </div>
-   </div>
+        </div>
+    </div>
 
 {% endblock %}

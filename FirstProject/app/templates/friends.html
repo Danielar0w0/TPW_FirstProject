@@ -3,44 +3,56 @@
 
 {% block content %}
 
-<div class="py-5">
-    <div class="container">
-        <div class="container-fluid py-5">
-             <form action="/search/" method="post" class="px-4 input-group w-auto">
-                 {% csrf_token %}
-                 <input type="search" name="query_friend" class="form-control rounded" placeholder="Search for your friends" aria-label="Search"/>
+    {% include "status_message.html" %}
+    <script src="{% static 'scripts/utils.js' %}"></script>
 
-                 <button type="button" class="btn btn-primary">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"></path>
-                     </svg>
-                 </button>
-             </form>
-         </div>
-        <div class="row row-cols-1 row-cols-sm-4 row-cols-md-6 g-3">
+    <div class="py-5">
+
+        <div class="container">
+
+            <h2 class="fw-bolder">Following</h2>
+
+            <div class="container-fluid py-5">
+                <form action="/search/" method="post" class="px-4 input-group w-auto">
+                    {% csrf_token %}
+                    <input type="search" name="query_friend" class="form-control rounded"
+                           placeholder="Search for who you're following..." aria-label="Search"/>
+                    <input type="submit" class="btn btn-primary" value="Search"/>
+                </form>
+            </div>
             {% if users|length > 0 %}
-                {% for friend in users %}
-                    <div class="col">
-                        <div class="card shadow-sm">
-                            <img src="/media/{{ friend.image.name }}">
-                            <div class="card-body">
-                                <p class="card-text"> {{ friend.username }} </br>
-                                    <small class="text-muted">Description</small>
-                                </p>
+                <div class="row row-cols-1 row-cols-sm-3 row-cols-md-4 g-3">
 
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-primary">Check profile</button>
-                                        <button type="button" class="btn btn-sm btn-outline-primary">Edit</button>
+                    {% for friend in users %}
+                        <div class="col">
+                            <div class="card shadow-sm">
+                                <img src="/media/{{ friend.image.name }}">
+                                <div class="card-body">
+                                    <p class="card-text"> {{ friend.username }} </br>
+                                        <small class="text-muted">Description</small>
+                                    </p>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <button class="btn btn-primary"
+                                                    onclick="unfollowUser('{{ friend.user_email }}', '{{ csrf_token }}')">Unfollow
+                                            </button>
+                                            <button class="btn btn-outline-primary"
+                                                    onclick="redirect('/profile/' + '{{ friend.user_email }}')">Profile
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="container text-center mt-4">
+                    <p class="fw-light">You are not following anyone.</p>
+                </div>
             {% endif %}
         </div>
     </div>
-</div>
 
 {% endblock %}
