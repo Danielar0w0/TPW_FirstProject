@@ -129,7 +129,7 @@ def edit_profile(request):
 
         return render(request, 'edit_profile.html', {'formImage': form_image, 'formPassword': form_password, 'user': user})
 
-    return render(request, 'profile.html', {"user": user})
+    return redirect("/profile/")
 
 
 @login_required(login_url='/login/')
@@ -277,10 +277,9 @@ def comment(request):
 
         if form.is_valid():
             post_id = request.POST['post_id']
-            user_email = request.POST['user_email']
             comment_content = form.cleaned_data.get('comment_content')
 
-            user = User.objects.get(user_email=user_email)
+            user = User.objects.get(user_email=request.user.email)
 
             new_comment = Comment(post_id=post_id, content=comment_content, user=user)
             new_comment.save()
@@ -301,22 +300,18 @@ def post_details(request, post_id):
 def messages(request):
     user = User.objects.get(user_email=request.user.email)
     friends = Friendship.objects.filter(first_user__user_email=request.user.email)
-    messages_user = Message.objects.filter(Q(sender__username=request.user.username) |
-        Q(receiver__username=request.user.username))
 
     users = []
     for friend in friends:
-        users.append(friend.second_user)
+        if friend.second_user not in users:
+            users.append(friend.second_user)
 
-    for message in messages_user:
-        if message.receiver == request.user.username:
-            if message.sender not in users:
-                users.append(message.sender)
-        elif message.sender == request.user.username:
-            if message.receiver not in users:
-                users.append(message.receiver)
+    friends = Friendship.objects.filter(second_user__user_email=request.user.email)
+    for friend in friends:
+        if friend.first_user not in users:
+            users.append(friend.first_user)
 
-    return render(request, 'messages.html', {"users": users, 'user':user})
+    return render(request, 'messages.html', {"users": users, 'user': user})
 
 
 def messages_with(request, username):
@@ -342,7 +337,6 @@ def messages_with(request, username):
     other_user = User.objects.get(username=username)
     messages_with_user = Message.objects.filter(Q(receiver__username=username, sender__username=request.user.username) | \
                          Q(receiver__username=request.user.username, sender__username=username))
-    messages_with_user = Message.objects.all()
 
     params = {
         'form': form,
@@ -353,6 +347,7 @@ def messages_with(request, username):
     }
 
     return render(request, 'messages_with.html', params)
+
 
 def user_profile(request, email):
 

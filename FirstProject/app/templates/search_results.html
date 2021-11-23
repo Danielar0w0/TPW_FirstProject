@@ -8,16 +8,16 @@
            <div class="row row-cols-1 row-cols-sm-4 row-cols-md-6 g-3">
                 {% if users|length > 0 %}
                     {% for user in users %}
-                        <div class="col">
+                        <div class="col pt-4">
                             <div class="card shadow-sm" style="border: none">
                                 <img src="/media/{{ user.image.name }}" onerror="this.onerror=null;this.src='/static/imgs/{{ user.image.name }}';">
                                 <div class="card-body">
                                     <p class="card-text"> {{ user.username }} </br>
-                                        <small class="text-muted">Description</small>
+                                        <small class="text-muted">{{ user.user_email }}</small>
                                     </p>
 
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <div class="btn-group">
+                                        <div class="btn-group py-2">
                                             <button type="button" class="btn btn-sm btn-primary"><a href="/profile/{{ user.user_email }}" style="text-decoration: none; color: white;">Check profile</a></button>
                                         </div>
                                     </div>
