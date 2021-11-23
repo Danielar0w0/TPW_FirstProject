@@ -372,7 +372,11 @@ def messages_with(request, username):
 
 def user_profile(request, email):
 
-    user = User.objects.get(user_email=email)
+    try:
+        user = User.objects.get(user_email=email)
+    except ObjectDoesNotExist:
+        return render(request, 'not_found.html', {'message': 'User not found'})
+
     comment_form = CommentForm()
     following = len(Friendship.objects.filter(first_user=user))
     followers = len(Friendship.objects.filter(second_user=user))
