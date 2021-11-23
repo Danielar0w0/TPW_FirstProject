@@ -16,6 +16,11 @@ def layout(request):
 
 @login_required(login_url='/login/')
 def start_screen(request):
+
+    if request.user not in User.objects.all() and request.user.is_superuser:
+        user = User(username=request.user.username, user_email=request.user.email, password=request.user.password, admin=True)
+        user.save()
+
     user = User.objects.get(user_email=request.user.email)
     return render(request, 'startScreen.html', {'user': user})
 
@@ -26,6 +31,7 @@ def feed(request):
     all_posts = []
     comments_form = CommentForm()
     all_messages = []
+
 
     current_user = User.objects.get(user_email=request.user.email)
     friends_join = Friendship.objects.select_related('first_user', 'second_user').filter(first_user=current_user)
@@ -422,3 +428,14 @@ def unfollow_user(request, email):
             return HttpResponseNotFound('You are not following that user.')
 
         return HttpResponse(content='You have unfollowed {}.'.format(user_to_unfollow.username), content_type='text/plain')
+
+
+@login_required(login_url='/login/')
+def admin_panel(request):
+
+    user = User.objects.get(user_email=request.user.email)
+    if user.admin:
+        posts = Post.objects.all()
+        return render(request, 'admin_panel.html', {'posts': posts, 'user': user})
+
+    return redirect('/profile/')
